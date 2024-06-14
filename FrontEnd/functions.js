@@ -1,15 +1,33 @@
-const reponse = await fetch("http://localhost:5678/api/works");
-const works = await reponse.json();
-console.log(works[0]);
-
-const worksElement = document.querySelector(".gallery");
-
-for(let i=0; i<works.length; i++){
-    let work = `
-                <figure>
-                    <img src=${works[i].imageUrl} alt=${works[i].title}>
-                    <figcaption>${works[i].title}</figcaption>
-                </figure>`;
-    
-    worksElement.innerHTML += work;
+export function afficherTravaux(worksList, galleryZone){
+    galleryZone.innerHTML = "";
+    for(let i=0; i<worksList.length; i++){
+        let work = `
+                    <figure>
+                        <img src=${worksList[i].imageUrl} alt=${worksList[i].title}>
+                        <figcaption>${worksList[i].title}</figcaption>
+                    </figure>`;
+        
+        galleryZone.innerHTML += work;
+    }
 }
+
+
+export function filtrerTravaux(categories, worksList, galleryZone){
+    
+    for(let i=0; i<categories.length; i++){
+        categories[i].addEventListener('click',(e)=>{
+            categories.forEach(element => {
+                element.classList.remove("selected");
+            });
+            let newWorksList = worksList;
+            if(i != 0){
+                newWorksList = worksList.filter((work)=>{
+                    return work.categoryId === i;
+                });
+            }
+            afficherTravaux(newWorksList,galleryZone);
+            e.currentTarget.classList.add("selected");
+        });        
+    }    
+}
+

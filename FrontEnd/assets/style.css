@@ -30,6 +30,7 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
 	line-height: 1;
+	background-color: #fffef8;
 }
 ol, ul {
 	list-style: none;
@@ -125,6 +126,32 @@ li:hover {
 	text-align: center;
 	margin-bottom: 1em;
 }
+
+#filter{
+	margin: 50px 0 50px 0;
+}
+#filter ul{
+	display: flex;
+	justify-content: center;
+}
+#filter li{
+	border: 1px solid #1D6154;
+	border-radius: 30px;
+	color: #1D6154;
+	font-size: large;
+	font-weight: bolder;
+	padding: 8px 25px ;
+	margin: 0 6px 0 6px;
+
+}
+#filter li:hover{
+	cursor: pointer;
+}
+.selected{
+	background-color: #1D6154;
+	color: #fffef8 !important;
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
