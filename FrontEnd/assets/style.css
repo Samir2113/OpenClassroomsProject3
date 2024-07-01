@@ -95,8 +95,11 @@ nav li {
 	padding: 0 10px;
 	font-size: 1.2em;
 }
+nav li a{
+	text-decoration: none;
+}
 
-li:hover {
+li:hover, a:hover {
 	color: #B1663C;
 }
 #introduction {
@@ -211,5 +214,46 @@ footer nav ul {
 	display: flex;
 	justify-content: flex-end;
 	margin: 2em
+}
+
+/****************** Connexion.html **************************/
+nav li:nth-child(3) {
+	font-weight: bold;
+}
+
+#connexion{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+}
+
+.formulaire-connexion{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	height: 300px;
+	width: 40%;
+}
+.formulaire-connexion input{
+	border: 0px;
+	box-shadow: 0px 5px 8px 2px rgb(234, 230, 230);
+	width: 98%;
+	height: 50px;
+}
+.formulaire-connexion button{
+	background-color: #1D6154;
+	border: 0px;
+	border-radius: 30px;
+	padding: 10px 0px 10px 0px;
+	color: #fffef8;
+	width: 50%;
+	font-size: 140%;
+}
+.formulaire-connexion label{
+	width: 100%;
+	font-weight: bold;
 }
 
