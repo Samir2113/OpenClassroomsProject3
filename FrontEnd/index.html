@@ -7,17 +7,24 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
+	<script defer src="https://kit.fontawesome.com/81fae343a2.js" crossorigin="anonymous"></script>
 	<script type="module" src="main.js" defer></script>
+	<script type="module" src="functions.js" defer></script>
 </head>
 <body>
+	<aside id="editBanner">
+		<p>Mode édition</p>
+	</aside>
+	
 <header>
 	<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
 	<nav>
 		<ul>
-			<li>projets</li>
-			<li>contact</li>
+			<li><a href="index.html#portfolio">projets</a></li>
+			<li><a href="#contact">contact</a></li>
 			<li><a href="connexion.html">login</a></li>
 			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 		</ul>
@@ -29,6 +36,7 @@
 			<img src="./assets/images/sophie-bluel.png" alt="">
 		</figure>
 		<article>
+			
 			<h2>Designer d'espace</h2>
 			<p>Je raconte votre histoire, je valorise vos idées. Je vous accompagne de la conception à la livraison finale du chantier.</p>
 			<p>Chaque projet sera étudié en commun, de façon à mettre en valeur les volumes, les matières et les couleurs dans le respect de l’esprit des lieux et le choix adapté des matériaux. Le suivi du chantier sera assuré dans le souci du détail, le respect du planning et du budget.</p>
@@ -37,6 +45,44 @@
 	</section>
 	<section id="portfolio">
 		<h2>Mes Projets</h2>
+		<article id="editProjects">
+			<a href="#modal1" class="js-modal"><span class="material-symbols-outlined">edit_square</span>modifier</a>
+		</article>
+		<!-------- Modals -------->
+		<aside id="modal1" class="modal" aria-hidden="true" aria-modal="false" role="dialog" aria-labelledby="titleModal" style="display: none;">
+			<div class="modal-wrapper">
+				<i class="fa-solid fa-arrow-left" style="display: none;"></i>
+				<i class="fa-solid fa-xmark"></i>
+				<!--------Formulaire de suppression--------->	
+				<h2 id="titleModal" class="supp-form">Galerie photo</h2>
+				<article class="list-photo-edit supp-form" >
+				</article>
+				<!--------Formulaire d'ajout--------->	
+				<h2 id="titleModal2" style="display: none;">Ajout photo</h2>
+				<article class="projects-add-form" style="display: none;">
+					<form action="" method="post" enctype="multipart/form-data">
+						<div class="add-img">
+							<i class="fa-regular fa-image"></i>
+							<label for="imageUrl">+ Ajouter photo</label>
+							<input type="file" id="imageUrl" style="display: none;" accept=".img, .png" />
+							<span>jpg, png : 4mo max</span>
+						</div>
+						<label for="title">Titre</label>
+						<input type="text" name="title" id="title">
+						<label for="categoryId">Catégorie</label>
+						<select name="categoryId" id="categoryId">
+							<option value=""></option>
+						</select>
+					</form>
+				</article>
+				<button id="validateBtn" type="button" style="display: none;">Valider</button>
+                <!----------------------------------->
+				<button id="addImgBtn" class="supp-form" type="button">Ajouter une photo</button>	
+			</div>
+		</aside>
+		
+		<!------------------------------------------->
+		
 		<nav id="filter">
 			<ul >
 				<li class="selected">Tous</li>
@@ -70,5 +116,6 @@
 		</ul>
 	</nav>
 </footer>
+
 </body>
 </html>
