@@ -89,23 +89,30 @@ const openModal = function(e){
     afficherTravaux(works,worksEditZone, modal);
 
     //Suppression 
-    const test = document.querySelector('.list-photo-edit');
-    console.log(test);
-    test.querySelectorAll('.fa-trash-can').forEach(itemm => {
-        itemm.addEventListener('click', async (event) => {
-            event.preventDefault();
+    let test = document.querySelectorAll('.list-photo-edit .fa-trash-can');
+    console.log([test]);
+    test.forEach(async itemm => {
+        
+        itemm.addEventListener('click', async () => {
+            
+
             const idProject = itemm.parentElement.dataset.id;
+            console.log(itemm);
+            console.log(idProject);
             await fetch(`http://localhost:5678/api/works/${idProject}`,{
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             })
-            // Ici on rafraichit la modal
-            const worksMajReponse = await fetch("http://localhost:5678/api/works");
-            const worksMaj = await worksMajReponse.json(); 
-            afficherTravaux(worksMaj,worksEditZone, modal);
-        })})
+           
+        //     test = document.querySelector('.list-photo-edit');
+        })
+         // Ici on rafraichit la modal
+         const worksMajReponse = await fetch("http://localhost:5678/api/works");
+         const worksMaj = await worksMajReponse.json(); 
+         afficherTravaux(worksMaj,worksEditZone, modal);
+    })
     
     //Ajout projet
     const addImgBtn = document.querySelector("#addImgBtn");
@@ -125,11 +132,14 @@ const openModal = function(e){
         // const addProjectsForm = document.querySelector('.projects-add-form form');
         const validateFormBtn = document.querySelector('#validateBtn');
         validateFormBtn.addEventListener('click', async(e)=>{
-            const imgUrl = document.querySelector("#imageUrl").value;
+            const imgUrl = document.querySelector("#imageUrl").files[0];
+            const title = document.querySelector("#title").value;
+            const category = document.querySelector("#categoryId").value;
+            
             const formInputs = new FormData();
-            formInputs.append("image", "D:\\Documents\\Projet3 OC\\Portfolio-architecte-sophie-bluel-master\\FrontEnd\\assets\\images\\structures-thermopolis.png")
-            formInputs.append("title", "Structures Thermopolis");
-            formInputs.append("category", 1);
+            formInputs.append("image", imgUrl)
+            formInputs.append("title", title);
+            formInputs.append("category", category);
             console.log(Object.fromEntries(formInputs));
             // let objTest = {
             //     imageUrl:'D:\\Documents\\Projet3 OC\\Portfolio-architecte-sophie-bluel-master\\FrontEnd\\assets\\images\\structures-thermopolis.png',
@@ -138,10 +148,8 @@ const openModal = function(e){
             // }
             await fetch("http://localhost:5678/api/works", {
                 method: "POST",
-                body: Object.fromEntries(formInputs),
+                body: formInputs,
                 headers: {
-                    "Content-Type": "multipart/form-data",
-                    "accept": "application/json",
                     "Authorization": `Bearer ${sessionStorage.getItem('token')}`
                 }               
            }).then(res => res.json()).then(data=>console.log(data)).catch(err=>console.log(err))
@@ -177,11 +185,9 @@ const deleteProject = async function(e){
     console.log(myToken);
     const reponseDelWork = await fetch(`http://localhost:5678/api/works/${projectId}`, {
         method: "DELETE",
-        headers: {'Authorization': `Bearer ${myToken}`}
+        headers: {'Authorization': `Bearer ${sessionStorage.getItem('token')}`}
     });
-    console.log(reponseDelWork);
     const delWork = reponseDelWork.json();
-    console.log(delWork);
     console.log(`Réponse status: ${delWork.status}` );
 
 }
