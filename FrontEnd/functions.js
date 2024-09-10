@@ -90,28 +90,29 @@ const openModal = function(e){
 
     //Suppression 
     let test = document.querySelectorAll('.list-photo-edit .fa-trash-can');
-    console.log([test]);
     test.forEach(async itemm => {
-        
-        itemm.addEventListener('click', async () => {
-            
-
+        itemm.addEventListener('click', async (e) => {
+            e.stopPropagation();
             const idProject = itemm.parentElement.dataset.id;
             console.log(itemm);
-            console.log(idProject);
-            await fetch(`http://localhost:5678/api/works/${idProject}`,{
+            const rep = await fetch(`http://localhost:5678/api/works/${idProject}`,{
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
-            })
-           
-        //     test = document.querySelector('.list-photo-edit');
+            });
+            if(rep.ok){
+                console.log(rep);
+                console.log(itemm);
+                
+                itemm.parentElement.remove();
+            }else{
+                console.error("Erreur lors de la suppression");
+            }
+            const worksMajReponse = await fetch("http://localhost:5678/api/works");
+            const worksMaj = await worksMajReponse.json(); 
+            afficherTravaux(worksMaj,worksEditZone, modal);
         })
-         // Ici on rafraichit la modal
-         const worksMajReponse = await fetch("http://localhost:5678/api/works");
-         const worksMaj = await worksMajReponse.json(); 
-         afficherTravaux(worksMaj,worksEditZone, modal);
     })
     
     //Ajout projet
