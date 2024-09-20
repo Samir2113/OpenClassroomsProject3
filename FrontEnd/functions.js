@@ -123,36 +123,40 @@ const openModal = function(e){
             }
         });
         modalWrapper.classList.add('modal-wrapper-2');
-
+        console.log(imgUrl.value);
+        console.log(imgUrl.files[0]);
+        console.log(title.value);
+        console.log(category.value);
+        
         const formInputs = new FormData();
         const validateFormBtn = document.querySelector('#validateBtn');
         let validForm = false;
         inputs.forEach(input => {
             input.addEventListener('change', (e)=>{
-                const focusedInput = e.target;
-                const addImgZone = document.querySelector('.add-img');
-                if(focusedInput.id === "imageUrl" && focusedInput.files[0]){
-                    for(const item of addImgZone.children){
-                        if(item.id === "img-preview"){
-                            const fileReader = new FileReader();
-                            fileReader.onload = (e) => {item.setAttribute('src',focusedInput.result);}
-                            fileReader.readAsDataURL(focusedInput.files[0]);
-                            item.setAttribute('style','display: null');
-                        }else{
-                            item.setAttribute('style','display: none');
-                        }                        
-                    }
-                }else if(!inputs[0].files[0]){
-                    for(const item of addImgZone.children){
-                        // console.log(item);
-                        if(item.id === "img-preview" || item.id === "imageUrl"){
-                            item.setAttribute('style','display: none');
-                            // console.log(e.target.value);
-                        }else{
-                            item.setAttribute('style','display: null');
-                        }                        
-                    }
-                }
+                // const focusedInput = e.target;
+                // const addImgZone = document.querySelector('.add-img');
+                // if(focusedInput.id === "imageUrl" && focusedInput.files[0]){
+                //     for(const item of addImgZone.children){
+                //         if(item.id === "img-preview"){
+                //             const fileReader = new FileReader();
+                //             fileReader.onload = (e) => {item.setAttribute('src',focusedInput.result);}
+                //             fileReader.readAsDataURL(focusedInput.files[0]);
+                //             item.setAttribute('style','display: null');
+                //         }else{
+                //             item.setAttribute('style','display: none');
+                //         }                        
+                //     }
+                // }else if(!inputs[0].files[0]){
+                //     for(const item of addImgZone.children){
+                //         // console.log(item);
+                //         if(item.id === "img-preview" || item.id === "imageUrl"){
+                //             item.setAttribute('style','display: none');
+                //             // console.log(e.target.value);
+                //         }else{
+                //             item.setAttribute('style','display: null');
+                //         }                        
+                //     }
+                // }
                 for(const input of inputs){
                     if(input.value.trim() == ""){
                         validForm = false; 
@@ -172,15 +176,30 @@ const openModal = function(e){
                 formInputs.append("image", imgUrl.files[0])
                 formInputs.append("title", title.value);
                 formInputs.append("category", category.value);
-                
+                try {
+                    const reponse = await fetch("http://localhost:5678/api/works", {
+                        method: "POST",
+                        body: formInputs,
+                        headers: {
+                            "Authorization": `Bearer ${sessionStorage.getItem('token')}`
+                        }               
+                    });
+                    console.log(`Reponse: ${reponse}`);
+                    if(reponse.ok){
+                        const reponseDefinitive = await reponse.json();
+                        
+                        console.log(`Reponse def: ${reponseDefinitive}`);
+                        
+                    }else{
+                        console.log('Reponse def ko:');
+                        
+                    }    
+                } catch (error) {
+                    console.error('Probleme: ', error);
+                    
+                }
                 // console.log(Object.fromEntries(formInputs));
-                await fetch("http://localhost:5678/api/works", {
-                    method: "POST",
-                    body: formInputs,
-                    headers: {
-                        "Authorization": `Bearer ${sessionStorage.getItem('token')}`
-                    }               
-                });
+                
                 refreshInputs();
                 validForm = false;
                 afficherTravaux(worksZone,false);
@@ -199,7 +218,11 @@ const openModal = function(e){
 
 const refreshInputs = function(){
     inputs.map(input =>{
-        input.value = "";
+        if(input.type === "file"){
+            input.value = null;
+        }else{
+            input.value = "";
+        }
     })
 }
 const closeModal = function(e){
