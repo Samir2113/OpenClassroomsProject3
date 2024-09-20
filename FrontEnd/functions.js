@@ -1,29 +1,50 @@
-import { reponseWorks, modal, works, setModal,worksZone, worksEditZone } from "./main.js";
+import { reponseWorks, modal, works, setModal,worksZone, worksEditZone/*inputs,setImgUrl,setTitle,setCategory*/} from "./main.js";
 export {afficherTravaux, filtrerTravaux, displaySwitch, isConnected, openModal,deleteProject, setCategories}
+const imgUrl = document.querySelector("#imageUrl");
+const title = document.querySelector("#title");
+const category = document.querySelector("#categoryId");
+const inputs = [imgUrl,title,category];
+let trashList = document.querySelectorAll('.list-photo-edit .fa-trash-can');
 
 
-function afficherTravaux(worksList, galleryZone, modalState){
-    galleryZone.innerHTML = "";
-    let deleteIcon = "";
-    let figcaption = "";
+async function afficherTravaux(galleryZone, modalState){
     // Les différents tests sont effectués pour différencier l'affichage  
     // des travaux dans la section projets et ceux de la modal
-    if(modalState !== null){
-        deleteIcon =  `<i class="fa-solid fa-trash-can" style="color: #FFFFFF;"></i>`;
-    }
-    for(let i=0; i<worksList.length; i++){
-        if(modalState === null){
-            figcaption = `<figcaption>${worksList[i].title}</figcaption>`;
-        }
-        let work = `<figure data-id="${worksList[i].id}">
-                        ${deleteIcon}
-                        <img src=${worksList[i].imageUrl} alt=${worksList[i].title}>
-                        ${figcaption}
-                    </figure>`;
+    const reponseWorkss = await fetch("http://localhost:5678/api/works");
+    const workss = await reponseWorkss.json();
+    Array.from(galleryZone.children).map(item=>{
+        item.remove()
+    });
+    
+    let deleteIcon = document.createElement('i');
+    deleteIcon.className = "fa-solid fa-trash-can";
+    deleteIcon.setAttribute('style', "color: #FFFFFF;");
+    
+    for(let i=0; i<workss.length; i++){
+        let work = document.createElement('figure');
+        let imgWork = document.createElement('img');
+        work.setAttribute("data-id", workss[i].id);
+        imgWork.src = workss[i].imageUrl;
+        imgWork.alt = workss[i].title;
+        work.appendChild(imgWork)
         
-        galleryZone.innerHTML += work;
+        if(modalState === null){
+            let figcaption = document.createElement('figcaption');
+            figcaption.textContent = workss[i].title;
+            work.appendChild(figcaption)
+        }else{
+            work.prepend(deleteIcon.cloneNode())
+        }
+        galleryZone.appendChild(work);
     }
+    //Suppression 
+    trashList = document.querySelectorAll('.list-photo-edit .fa-trash-can');
+    trashList.forEach(async itemm => {
+        deleteProject(itemm);
+    });
+    
 }
+
 
 
 function filtrerTravaux(categories, worksList, galleryZone){
@@ -39,7 +60,7 @@ function filtrerTravaux(categories, worksList, galleryZone){
                     return work.categoryId === i;
                 });
             }
-            afficherTravaux(newWorksList,galleryZone);
+            afficherTravaux(newWorksList,galleryZone, modal);
             e.currentTarget.classList.add("selected");
         });        
     }    
@@ -86,111 +107,160 @@ const openModal = function(e){
     target.removeAttribute('aria-hidden');
     target.setAttribute('aria-modal', 'true');
     setModal(target);
-    afficherTravaux(works,worksEditZone, modal);
+    afficherTravaux(worksEditZone, modal);
 
-    //Suppression 
-    let test = document.querySelectorAll('.list-photo-edit .fa-trash-can');
-    test.forEach(async itemm => {
-        itemm.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const idProject = itemm.parentElement.dataset.id;
-            console.log(itemm);
-            const rep = await fetch(`http://localhost:5678/api/works/${idProject}`,{
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-                }
-            });
-            if(rep.ok){
-                console.log(rep);
-                console.log(itemm);
-                
-                itemm.parentElement.remove();
-            }else{
-                console.error("Erreur lors de la suppression");
-            }
-            const worksMajReponse = await fetch("http://localhost:5678/api/works");
-            const worksMaj = await worksMajReponse.json(); 
-            afficherTravaux(worksMaj,worksEditZone, modal);
-        })
-    })
-    
     //Ajout projet
     const addImgBtn = document.querySelector("#addImgBtn");
     addImgBtn.addEventListener('click', ()=>{
-        const modalWrapper = document.querySelector('.modal-wrapper');
         const modalElmts = modalWrapper.children;
         let modalElmtsArray = Array.from(modalElmts);
         modalElmtsArray.forEach((item)=>{
             let itemClassList = Array.from(item.classList);
             if(itemClassList.includes('supp-form')){
                 item.style.display = "none";
-                modalWrapper.classList.add('modal-wrapper-2')
             }else{
                 item.style.display = null;
             }
         });
-        // const addProjectsForm = document.querySelector('.projects-add-form form');
+        modalWrapper.classList.add('modal-wrapper-2');
+
+        const formInputs = new FormData();
         const validateFormBtn = document.querySelector('#validateBtn');
+        let validForm = false;
+        inputs.forEach(input => {
+            input.addEventListener('change', (e)=>{
+                const focusedInput = e.target;
+                const addImgZone = document.querySelector('.add-img');
+                if(focusedInput.id === "imageUrl" && focusedInput.files[0]){
+                    for(const item of addImgZone.children){
+                        if(item.id === "img-preview"){
+                            const fileReader = new FileReader();
+                            fileReader.onload = (e) => {item.setAttribute('src',focusedInput.result);}
+                            fileReader.readAsDataURL(focusedInput.files[0]);
+                            item.setAttribute('style','display: null');
+                        }else{
+                            item.setAttribute('style','display: none');
+                        }                        
+                    }
+                }else if(!inputs[0].files[0]){
+                    for(const item of addImgZone.children){
+                        // console.log(item);
+                        if(item.id === "img-preview" || item.id === "imageUrl"){
+                            item.setAttribute('style','display: none');
+                            // console.log(e.target.value);
+                        }else{
+                            item.setAttribute('style','display: null');
+                        }                        
+                    }
+                }
+                for(const input of inputs){
+                    if(input.value.trim() == ""){
+                        validForm = false; 
+                        break;
+                    }
+                    validForm = true;
+                }         
+                console.log(validForm);
+                
+                (validForm) ? validateFormBtn.classList.add('okColor') : validateFormBtn.classList.remove('okColor');
+            });
+        });
+        
+        
         validateFormBtn.addEventListener('click', async(e)=>{
-            const imgUrl = document.querySelector("#imageUrl").files[0];
-            const title = document.querySelector("#title").value;
-            const category = document.querySelector("#categoryId").value;
-            
-            const formInputs = new FormData();
-            formInputs.append("image", imgUrl)
-            formInputs.append("title", title);
-            formInputs.append("category", category);
-            console.log(Object.fromEntries(formInputs));
-            // let objTest = {
-            //     imageUrl:'D:\\Documents\\Projet3 OC\\Portfolio-architecte-sophie-bluel-master\\FrontEnd\\assets\\images\\structures-thermopolis.png',
-            //     title:'Structures Thermopolis',
-            //     categoryId:1
-            // }
-            await fetch("http://localhost:5678/api/works", {
-                method: "POST",
-                body: formInputs,
-                headers: {
-                    "Authorization": `Bearer ${sessionStorage.getItem('token')}`
-                }               
-           }).then(res => res.json()).then(data=>console.log(data)).catch(err=>console.log(err))
+            if(validForm){
+                formInputs.append("image", imgUrl.files[0])
+                formInputs.append("title", title.value);
+                formInputs.append("category", category.value);
+                
+                // console.log(Object.fromEntries(formInputs));
+                await fetch("http://localhost:5678/api/works", {
+                    method: "POST",
+                    body: formInputs,
+                    headers: {
+                        "Authorization": `Bearer ${sessionStorage.getItem('token')}`
+                    }               
+                });
+                refreshInputs();
+                validForm = false;
+                afficherTravaux(worksZone,false);
+            }
+        });
+        // Retour à la modal de suppression de projet
+        const goBackArrowBtn = document.querySelector('.fa-arrow-left');
+        goBackArrowBtn.addEventListener('click', ()=>{
+            goBackArrow(modalWrapper,modalElmtsArray);
         });
     });
-
     modal.addEventListener('click', closeModal);
     closeBtn.addEventListener('click', closeModal);
     modal.querySelector('.modal-wrapper').addEventListener('click', stopPropagation);
 }
 
+const refreshInputs = function(){
+    inputs.map(input =>{
+        input.value = "";
+    })
+}
 const closeModal = function(e){
-    if(modal === null) return
+    if(modal === null){
+        return
+    }
     e.preventDefault();
     modal.style.display = "none";
     modal.setAttribute('aria-hidden', 'true');
     modal.removeAttribute('aria-modal');
     modal.querySelector('.modal-wrapper').removeEventListener('click', stopPropagation);
     setModal(null);
+    refreshInputs();
+}
+
+const goBackArrow = function(modalZone,elementList){
+    elementList.forEach((item)=>{
+        let itemClassList = Array.from(item.classList);
+        if(itemClassList.includes('add-form')){
+            item.style.display = "none";
+        }else{
+            item.style.display = null;
+        }
+    });
+    modalZone.classList.remove('modal-wrapper-2');
+    afficherTravaux(worksEditZone, modal);
+    // const trashList = document.querySelectorAll('.list-photo-edit .fa-trash-can');
+    refreshInputs();
 }
 
 const stopPropagation = function(e){
     e.stopPropagation();
 }
 
-const deleteProject = async function(e){
-    console.log('hello');
-    console.log('e: '+ e);
-    console.log(e.target);
-    const projectId = e.target.parentNode.dataset.id;
+// const deleteProject = async function(e){
+//     console.log('hello');
+//     console.log('e: '+ e);
+//     console.log(e.target);
+//     const projectId = e.target.parentNode.dataset.id;
     
-    let myToken = sessionStorage.getItem('token');
-    console.log(myToken);
-    const reponseDelWork = await fetch(`http://localhost:5678/api/works/${projectId}`, {
-        method: "DELETE",
-        headers: {'Authorization': `Bearer ${sessionStorage.getItem('token')}`}
-    });
-    const delWork = reponseDelWork.json();
-    console.log(`Réponse status: ${delWork.status}` );
-
+//     let myToken = sessionStorage.getItem('token');
+//     console.log(myToken);
+//     const reponseDelWork = await fetch(`http://localhost:5678/api/works/${projectId}`, {
+//         method: "DELETE",
+//         headers: {'Authorization': `Bearer ${sessionStorage.getItem('token')}`}
+//     });
+//     const delWork = reponseDelWork.json();
+//     console.log(`Réponse status: ${delWork.status}` );
+// }
+const deleteProject = async function(trashItem){
+    trashItem.addEventListener('click', async (e) => { 
+        const idProject = e.target.parentElement.dataset.id;
+        const rep = await fetch(`http://localhost:5678/api/works/${idProject}`,{
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            }
+        });
+        e.target.parentElement.remove();
+        afficherTravaux(worksZone,modal)
+    });     
 }
 
 const setCategories = function(inputArea, categorieList){  

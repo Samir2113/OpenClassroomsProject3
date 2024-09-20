@@ -51,17 +51,18 @@
 		<!-------- Modals -------->
 		<aside id="modal1" class="modal" aria-hidden="true" aria-modal="false" role="dialog" aria-labelledby="titleModal" style="display: none;">
 			<div class="modal-wrapper">
-				<i class="fa-solid fa-arrow-left" style="display: none;"></i>
+				<i class="fa-solid fa-arrow-left add-form" style="display: none;"></i>
 				<i class="fa-solid fa-xmark"></i>
 				<!--------Formulaire de suppression--------->	
 				<h2 id="titleModal" class="supp-form">Galerie photo</h2>
 				<article class="list-photo-edit supp-form" >
 				</article>
 				<!--------Formulaire d'ajout--------->	
-				<h2 id="titleModal2" style="display: none;">Ajout photo</h2>
-				<article class="projects-add-form" style="display: none;">
+				<h2 id="titleModal2" class="add-form" style="display: none;">Ajout photo</h2>
+				<article class="projects-add-form add-form" style="display: none;">
 					<form action="" method="post" enctype="multipart/form-data">
 						<div class="add-img">
+							<img id="img-preview" src="" alt="input_img" style="display: none;">
 							<i class="fa-regular fa-image"></i>
 							<label for="imageUrl">+ Ajouter photo</label>
 							<input type="file" id="imageUrl" style="display: none;" accept=".img, .png" />
@@ -75,7 +76,7 @@
 						</select>
 					</form>
 				</article>
-				<button id="validateBtn" type="button" style="display: none;">Valider</button>
+				<button id="validateBtn" class="add-form" type="button" style="display: none;">Valider</button>
                 <!----------------------------------->
 				<button id="addImgBtn" class="supp-form" type="button">Ajouter une photo</button>	
 			</div>
