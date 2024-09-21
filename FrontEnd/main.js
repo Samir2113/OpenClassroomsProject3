@@ -1,12 +1,11 @@
-import { afficherTravaux, displaySwitch, filtrerTravaux, isConnected, openModal, setCategories} from "./functions.js";
-export {reponseWorks, works, workCategories, worksZone, worksEditZone,modal/*inputs, setImgUrl,setTitle,setCategory,*/,setModal}
+import { afficherTravaux, displaySwitch, isConnected, openModal, setCategories} from "./functions.js";
+export {reponseWorks, works, workCategories, worksZone, worksEditZone, filterList, modal,setModal}
 
 
 const reponseWorks = await fetch("http://localhost:5678/api/works"); 
 const works = await reponseWorks.json();
 const reponseCategories = await fetch("http://localhost:5678/api/categories"); 
 const workCategories = await reponseCategories.json();
-// console.log(works);
 
 let connected = isConnected();
 const worksZone = document.querySelector(".gallery");
@@ -23,7 +22,7 @@ displaySwitch(connected);
 
 afficherTravaux(worksZone, modal);
 
-filtrerTravaux(filterList,works,worksZone);
+// filtrerTravaux(filterList,works,worksZone);
 
 setCategories(formCatInput, workCategories);
 
