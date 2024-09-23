@@ -1,31 +1,50 @@
 import {
   reponseWorks,
   modal,
+  loginLink,
   works,
   setModal,
   worksZone,
-  worksEditZone /*inputs,setImgUrl,setTitle,setCategory*/,
+  worksEditZone,
+  filteredList
 } from "./main.js";
 export {
   afficherTravaux,
-  filtrerTravaux,
   displaySwitch,
   isConnected,
   openModal,
   deleteProject,
   setCategories,
+  logout,
 };
+const modalWrapper = document.querySelector(".modal-wrapper");
 const imgUrl = document.querySelector("#imageUrl");
 const title = document.querySelector("#title");
 const category = document.querySelector("#categoryId");
 const inputs = [imgUrl, title, category];
+const validateFormBtn = document.querySelector("#validateBtn");
+let validForm = false;
 let trashList = document.querySelectorAll(".list-photo-edit .fa-trash-can");
 
-async function afficherTravaux(galleryZone, modalState) {
+async function getWorks(){
+  const reponseWorks = await fetch("http://localhost:5678/api/works");
+  const works = await reponseWorks.json();
+  return works
+}  
+
+function afficherTravaux(workss, galleryZone, modalState) {
   // Les différents tests sont effectués pour différencier l'affichage
   // des travaux dans la section projets et ceux de la modal
-  const reponseWorkss = await fetch("http://localhost:5678/api/works");
-  const workss = await reponseWorkss.json();
+  // const reponseWorkss = await fetch("http://localhost:5678/api/works");
+  // const workss = await reponseWorkss.json();
+  // let filteredWork = workss;
+
+  
+  // if(!isConnected){
+  //   console.log(filteredList);
+  //   workss = filteredList;
+  // }
+
   Array.from(galleryZone.children).map((item) => {
     item.remove();
   });
@@ -33,6 +52,7 @@ async function afficherTravaux(galleryZone, modalState) {
   let deleteIcon = document.createElement("i");
   deleteIcon.className = "fa-solid fa-trash-can";
   deleteIcon.setAttribute("style", "color: #FFFFFF;");
+
 
   for (let i = 0; i < workss.length; i++) {
     let work = document.createElement("figure");
@@ -51,35 +71,45 @@ async function afficherTravaux(galleryZone, modalState) {
     }
     galleryZone.appendChild(work);
   }
-  //Suppression
+  //Suppression de projets
   trashList = document.querySelectorAll(".list-photo-edit .fa-trash-can");
   trashList.forEach(async (itemm) => {
     deleteProject(itemm);
   });
 }
 
-function filtrerTravaux(categories, worksList, galleryZone) {
-  for (let i = 0; i < categories.length; i++) {
-    categories[i].addEventListener("click", (e) => {
-      categories.forEach((element) => {
-        element.classList.remove("selected");
-      });
-      let newWorksList = worksList;
-      if (i != 0) {
-        newWorksList = worksList.filter((work) => {
-          return work.categoryId === i;
-        });
-      }
-      afficherTravaux(newWorksList, galleryZone, modal);
-      e.currentTarget.classList.add("selected");
-    });
-  }
-}
+// function filtrerTravaux(categories, worksList, galleryZone) {
+//   for (let i = 0; i < categories.length; i++) {
+//     categories[i].addEventListener("click", (e) => {
+//       categories.forEach((element) => {
+//         element.classList.remove("selected");
+//       });
+//       let newWorksList = worksList;
+//       if (i != 0) {
+//         newWorksList = worksList.filter((work) => {
+//           return work.categoryId === i;
+//         });
+//       }
+//       afficherTravaux(newWorksList, galleryZone, modal);
+//       e.currentTarget.classList.add("selected");
+//     });
+//   }
+// }
+
+
+const setCategories = function (inputArea, categorieList) {
+  categorieList.map((cat) => {
+    let cateOption = document.createElement("option");
+    cateOption.setAttribute("value", cat.id);
+    cateOption.textContent = cat.name;
+    inputArea.appendChild(cateOption);
+  });
+};
 
 function displaySwitch(inputMode) {
-  console.log(inputMode);
   if (inputMode === true) {
     document.getElementById("editBanner").style.display = "flex";
+    loginLink.textContent = "logout";
     document.getElementById("filter").style.display = "none";
     document.getElementById("portfolio").style.display = "flex";
     document.querySelector("#portfolio> h2").style.paddingBottom = `2em`;
@@ -88,7 +118,6 @@ function displaySwitch(inputMode) {
     document.querySelector("#portfolio> h2").style.width = `60%`;
     document.getElementById("editProjects").style.display = "flex";
   } else {
-    console.log(document.getElementById("editBanner"));
     document.getElementById("editBanner").style.display = "none";
     document.getElementById("filter").style.display = "";
     document.getElementById("portfolio").style.flexWrap = "nowrap";
@@ -105,113 +134,17 @@ function isConnected() {
   }
 }
 
-const openModal = function (e) {
+const openModal = async function (e) {
+  const reponseWorks = await fetch("http://localhost:5678/api/works");
+  const works = await reponseWorks.json();
   e.preventDefault();
   const target = document.querySelector(e.target.getAttribute("href"));
   const closeBtn = document.querySelector(".fa-xmark");
-  const modalWrapper = document.querySelector(".modal-wrapper");
-  const body = document.querySelector("body");
   target.style.display = null;
   target.removeAttribute("aria-hidden");
   target.setAttribute("aria-modal", "true");
   setModal(target);
-  afficherTravaux(worksEditZone, modal);
-
-  //Ajout projet
-  const addImgBtn = document.querySelector("#addImgBtn");
-  addImgBtn.addEventListener("click", () => {
-    const modalElmts = modalWrapper.children;
-    let modalElmtsArray = Array.from(modalElmts);
-    modalElmtsArray.forEach((item) => {
-      let itemClassList = Array.from(item.classList);
-      if (itemClassList.includes("supp-form")) {
-        item.style.display = "none";
-      } else {
-        item.style.display = null;
-      }
-    });
-    modalWrapper.classList.add("modal-wrapper-2");
-
-    const validateFormBtn = document.querySelector("#validateBtn");
-    let validForm = false;
-    inputs.forEach((input) => {
-      input.addEventListener("change", (e) => {
-        // const focusedInput = e.target;
-        // const addImgZone = document.querySelector('.add-img');
-        // if(focusedInput.id === "imageUrl" && focusedInput.files[0]){
-        //     for(const item of addImgZone.children){
-        //         if(item.id === "img-preview"){
-        //             const fileReader = new FileReader();
-        //             fileReader.onload = (e) => {item.setAttribute('src',focusedInput.result);}
-        //             fileReader.readAsDataURL(focusedInput.files[0]);
-        //             item.setAttribute('style','display: null');
-        //         }else{
-        //             item.setAttribute('style','display: none');
-        //         }
-        //     }
-        // }else if(!inputs[0].files[0]){
-        //     for(const item of addImgZone.children){
-        //         // console.log(item);
-        //         if(item.id === "img-preview" || item.id === "imageUrl"){
-        //             item.setAttribute('style','display: none');
-        //             // console.log(e.target.value);
-        //         }else{
-        //             item.setAttribute('style','display: null');
-        //         }
-        //     }
-        // }
-        for (const input of inputs) {
-          if (input.value.trim() == "") {
-            validForm = false;
-            break;
-          }
-          validForm = true;
-        }
-        console.log(validForm);
-
-        validForm
-          ? validateFormBtn.classList.add("okColor")
-          : validateFormBtn.classList.remove("okColor");
-      });
-    });
-
-    validateFormBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      if (validForm) {
-        const formInputs = new FormData();
-        formInputs.append("image", imgUrl.files[0]);
-        formInputs.append("title", title.value);
-        formInputs.append("category", category.value);
-        try {
-          const reponse = await fetch("http://localhost:5678/api/works", {
-            method: "POST",
-            body: formInputs,
-            headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
-          });
-          console.log(`Reponse: ${reponse}`);
-          if (reponse.ok) {
-            const reponseDefinitive = await reponse.json();
-          } else {
-            console.log("Reponse def ko:");
-          }
-        } catch (error) {
-          console.error("Probleme: ", error);
-        }
-        refreshInputs();
-        validForm = false;
-
-        afficherTravaux(worksZone, false);
-      }
-    });
-
-    // Retour à la modal de suppression de projet
-    const goBackArrowBtn = document.querySelector(".fa-arrow-left");
-    goBackArrowBtn.addEventListener("click", () => {
-      goBackArrow(modalWrapper, modalElmtsArray);
-    });
-  });
+  afficherTravaux(works, worksEditZone, modal);
   modal.addEventListener("click", closeModal);
   closeBtn.addEventListener("click", closeModal);
   modal
@@ -219,15 +152,155 @@ const openModal = function (e) {
     .addEventListener("click", stopPropagation);
 };
 
-const refreshInputs = function () {
-  inputs.map((input) => {
+//Ajout projet
+const addImgBtn = document.querySelector("#addImgBtn");
+addImgBtn.addEventListener("click", () => {
+  const modalElmts = modalWrapper.children;
+  let modalElmtsArray = Array.from(modalElmts);
+  modalElmtsArray.forEach((item) => {
+    let itemClassList = Array.from(item.classList);
+    if (itemClassList.includes("supp-form")) {
+      item.style.display = "none";
+    } else {
+      item.style.display = null;
+    }
+  });
+  modalWrapper.classList.add("modal-wrapper-2");
+
+  //Preview image
+  inputs.forEach((input) => {
+    input.addEventListener("change", (e) => {
+      const focusedInput = e.target;
+      const addImgZone = document.querySelector(".add-img");
+      if (focusedInput.id === "imageUrl" && focusedInput.files[0]) {
+        for (const item of addImgZone.children) {
+          if (item.id === "img-preview") {
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+              item.setAttribute("src", fileReader.result);
+            };
+            fileReader.readAsDataURL(focusedInput.files[0]);
+            item.setAttribute("style", "display: null");
+          } else {
+            item.setAttribute("style", "display: none");
+          }
+        }
+      } else if (!inputs[0].files[0]) {
+        for (const item of addImgZone.children) {
+          // console.log(item);
+          if (item.id === "img-preview" || item.id === "imageUrl") {
+            item.setAttribute("style", "display: none");
+            // console.log(e.target.value);
+          } else {
+            item.setAttribute("style", "display: null");
+          }
+        }
+      }
+
+      /// Vérification Validité Formulaire ///
+      for (const input of inputs) {
+        if (input.value.trim() == "") {
+          validForm = false;
+          break;
+        }
+        validForm = true;
+      }
+      validForm
+        ? validateFormBtn.classList.add("okColor")
+        : validateFormBtn.classList.remove("okColor");
+    });
+  });
+  // Retour à la modal de suppression de projet
+  const goBackArrowBtn = document.querySelector(".fa-arrow-left");
+  goBackArrowBtn.addEventListener("click", () => {
+    goBackArrow(modalWrapper, modalElmtsArray);
+  });
+});
+
+// Validation du formulaire
+
+validateFormBtn.addEventListener("click", async (e) => {
+  if (validForm) {
+    let formInputs = new FormData();
+    formInputs.append("image", imgUrl.files[0]);
+    formInputs.append("title", title.value);
+    formInputs.append("category", category.value);
+    try {
+      const reponse = await fetch("http://localhost:5678/api/works", {
+        method: "POST",
+        body: formInputs,
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      });
+    } catch (error) {
+      console.error("Probleme: ", error);
+    }
+
+    // Reset formulaire - Refresh WorksPage
+    formInputs = new FormData();
+    validForm = false;
+    refreshInputs();
+    const reponseWorks = await fetch("http://localhost:5678/api/works");
+    const works = await reponseWorks.json();
+    afficherTravaux(works, worksZone, null);
+  }
+});
+
+function refreshInputs() {
+  const formImgZone = document.querySelector(".add-img").children;
+  const imgPreview = document.querySelector("#img-preview");
+  Array.from(formImgZone).forEach((item) => {
+    if (item.id === imgPreview.id || item.type === "file") {
+      imgPreview.setAttribute("style", "display: none");
+    } else {
+      item.setAttribute("style", "display: null");
+    }
+  });
+  imgUrl.v;
+  inputs.forEach((input) => {
     if (input.type === "file") {
       input.value = null;
     } else {
       input.value = "";
+      input.setAttribute("style", "display: null");
     }
   });
+  validateFormBtn.classList.remove("okColor");
+}
+
+const goBackArrow = async function (modalZone, elementList) {
+  const reponseWorks = await fetch("http://localhost:5678/api/works");
+  const works = await reponseWorks.json();
+  elementList.forEach((item) => {
+    let itemClassList = Array.from(item.classList);
+    if (itemClassList.includes("add-form")) {
+      item.style.display = "none";
+    } else {
+      item.style.display = null;
+    }
+  });
+  modalZone.classList.remove("modal-wrapper-2");
+  afficherTravaux(works, worksEditZone, modal);
+  refreshInputs();
 };
+
+const deleteProject = async function (trashItem) {
+  trashItem.addEventListener("click", async (e) => {
+    const idProject = e.target.parentElement.dataset.id;
+    const rep = await fetch(`http://localhost:5678/api/works/${idProject}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    });
+    e.target.parentElement.remove();
+    const reponseWorks = await fetch("http://localhost:5678/api/works");
+    const works = await reponseWorks.json();
+    afficherTravaux(works, worksZone, null);
+  });
+};
+
 const closeModal = function (e) {
   if (modal === null) {
     return;
@@ -243,44 +316,11 @@ const closeModal = function (e) {
   refreshInputs();
 };
 
-const goBackArrow = function (modalZone, elementList) {
-  elementList.forEach((item) => {
-    let itemClassList = Array.from(item.classList);
-    if (itemClassList.includes("add-form")) {
-      item.style.display = "none";
-    } else {
-      item.style.display = null;
-    }
-  });
-  modalZone.classList.remove("modal-wrapper-2");
-  afficherTravaux(worksEditZone, modal);
-  refreshInputs();
-};
-
 const stopPropagation = function (e) {
   e.stopPropagation();
 };
 
-
-const deleteProject = async function (trashItem) {
-  trashItem.addEventListener("click", async (e) => {
-    const idProject = e.target.parentElement.dataset.id;
-    const rep = await fetch(`http://localhost:5678/api/works/${idProject}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-      },
-    });
-    e.target.parentElement.remove();
-    afficherTravaux(worksZone, modal);
-  });
-};
-
-const setCategories = function (inputArea, categorieList) {
-  categorieList.map((cat) => {
-    let cateOption = document.createElement("option");
-    cateOption.setAttribute("value", cat.id);
-    cateOption.textContent = cat.name;
-    inputArea.appendChild(cateOption);
-  });
-};
+function logout() {
+  sessionStorage.setItem("token", "");
+  document.location.href = "index.html";
+}
