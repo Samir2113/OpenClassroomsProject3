@@ -1,12 +1,9 @@
 import {
-  reponseWorks,
   modal,
   loginLink,
-  works,
   setModal,
   worksZone,
   worksEditZone,
-  filteredList
 } from "./main.js";
 export {
   afficherTravaux,
@@ -35,16 +32,6 @@ async function getWorks(){
 function afficherTravaux(workss, galleryZone, modalState) {
   // Les différents tests sont effectués pour différencier l'affichage
   // des travaux dans la section projets et ceux de la modal
-  // const reponseWorkss = await fetch("http://localhost:5678/api/works");
-  // const workss = await reponseWorkss.json();
-  // let filteredWork = workss;
-
-  
-  // if(!isConnected){
-  //   console.log(filteredList);
-  //   workss = filteredList;
-  // }
-
   Array.from(galleryZone.children).map((item) => {
     item.remove();
   });
@@ -77,34 +64,6 @@ function afficherTravaux(workss, galleryZone, modalState) {
     deleteProject(itemm);
   });
 }
-
-// function filtrerTravaux(categories, worksList, galleryZone) {
-//   for (let i = 0; i < categories.length; i++) {
-//     categories[i].addEventListener("click", (e) => {
-//       categories.forEach((element) => {
-//         element.classList.remove("selected");
-//       });
-//       let newWorksList = worksList;
-//       if (i != 0) {
-//         newWorksList = worksList.filter((work) => {
-//           return work.categoryId === i;
-//         });
-//       }
-//       afficherTravaux(newWorksList, galleryZone, modal);
-//       e.currentTarget.classList.add("selected");
-//     });
-//   }
-// }
-
-
-const setCategories = function (inputArea, categorieList) {
-  categorieList.map((cat) => {
-    let cateOption = document.createElement("option");
-    cateOption.setAttribute("value", cat.id);
-    cateOption.textContent = cat.name;
-    inputArea.appendChild(cateOption);
-  });
-};
 
 function displaySwitch(inputMode) {
   if (inputMode === true) {
@@ -152,7 +111,17 @@ const openModal = async function (e) {
     .addEventListener("click", stopPropagation);
 };
 
-//Ajout projet
+// liste les catégories du formulaire
+const setCategories = function (inputArea, categorieList) {
+  categorieList.map((cat) => {
+    let cateOption = document.createElement("option");
+    cateOption.setAttribute("value", cat.id);
+    cateOption.textContent = cat.name;
+    inputArea.appendChild(cateOption);
+  });
+};
+
+//Ajout de projets
 const addImgBtn = document.querySelector("#addImgBtn");
 addImgBtn.addEventListener("click", () => {
   const modalElmts = modalWrapper.children;
@@ -187,10 +156,8 @@ addImgBtn.addEventListener("click", () => {
         }
       } else if (!inputs[0].files[0]) {
         for (const item of addImgZone.children) {
-          // console.log(item);
           if (item.id === "img-preview" || item.id === "imageUrl") {
             item.setAttribute("style", "display: none");
-            // console.log(e.target.value);
           } else {
             item.setAttribute("style", "display: null");
           }
@@ -210,15 +177,14 @@ addImgBtn.addEventListener("click", () => {
         : validateFormBtn.classList.remove("okColor");
     });
   });
-  // Retour à la modal de suppression de projet
+  /// Retour à la modal de suppression de projet ///
   const goBackArrowBtn = document.querySelector(".fa-arrow-left");
   goBackArrowBtn.addEventListener("click", () => {
     goBackArrow(modalWrapper, modalElmtsArray);
   });
 });
 
-// Validation du formulaire
-
+/// Validation du formulaire ///
 validateFormBtn.addEventListener("click", async (e) => {
   if (validForm) {
     let formInputs = new FormData();
@@ -237,8 +203,7 @@ validateFormBtn.addEventListener("click", async (e) => {
       console.error("Probleme: ", error);
     }
 
-    // Reset formulaire - Refresh WorksPage
-    formInputs = new FormData();
+    /// Reset formulaire - Refresh WorksPage ///
     validForm = false;
     refreshInputs();
     const reponseWorks = await fetch("http://localhost:5678/api/works");
@@ -250,6 +215,7 @@ validateFormBtn.addEventListener("click", async (e) => {
 function refreshInputs() {
   const formImgZone = document.querySelector(".add-img").children;
   const imgPreview = document.querySelector("#img-preview");
+  /// RàZ de la "Zone preview" du Formulaire ///
   Array.from(formImgZone).forEach((item) => {
     if (item.id === imgPreview.id || item.type === "file") {
       imgPreview.setAttribute("style", "display: none");
@@ -257,7 +223,7 @@ function refreshInputs() {
       item.setAttribute("style", "display: null");
     }
   });
-  imgUrl.v;
+  /// RàZ des "Inputs" du Formulaire ///
   inputs.forEach((input) => {
     if (input.type === "file") {
       input.value = null;
@@ -281,8 +247,8 @@ const goBackArrow = async function (modalZone, elementList) {
     }
   });
   modalZone.classList.remove("modal-wrapper-2");
-  afficherTravaux(works, worksEditZone, modal);
   refreshInputs();
+  afficherTravaux(works, worksEditZone, modal);
 };
 
 const deleteProject = async function (trashItem) {
@@ -294,10 +260,10 @@ const deleteProject = async function (trashItem) {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
     });
-    e.target.parentElement.remove();
+    e.target.parentElement.remove(); // Delete dans la modale
     const reponseWorks = await fetch("http://localhost:5678/api/works");
     const works = await reponseWorks.json();
-    afficherTravaux(works, worksZone, null);
+    afficherTravaux(works, worksZone, null); // MàJ Page en Arrière plan
   });
 };
 

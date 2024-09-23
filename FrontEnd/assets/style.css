@@ -47,7 +47,7 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-/** end reset css**/
+
 body {
 	max-width: 1500px;
 	margin:auto;
@@ -116,12 +116,8 @@ nav li {
 }
 nav li a{
 	text-decoration: none;
-	/* color: black; */
 }
 
-/* .header-link{
-	color: black;
-} */
 .header-link:visited{
 	color: rgb(0, 0, 0);
 }
@@ -367,7 +363,6 @@ nav li:nth-child(3) {
 }
 .list-photo-edit figure img{
 	width: 100%;
-	/* height: 120px; */
 }
 #addImgBtn{
 	background-color: #1D6154;
@@ -463,7 +458,6 @@ nav li:nth-child(3) {
 
 #validateBtn{
 	grid-column: 3/5;
-	/* background-color: #1D6154; */
 	background-color: #a7a7a7;
 	color: #fff;
 	border: none;
@@ -478,6 +472,3 @@ nav li:nth-child(3) {
 .okColor{
 	background-color: #1D6154 !important;
 }
-/* .notOkColor{
-	background-color: #a7a7a7;
-} */

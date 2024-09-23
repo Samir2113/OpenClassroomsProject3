@@ -1,5 +1,4 @@
 async function connexion(){
-    console.log("je suis ici");
     let inputList = document.querySelectorAll(".formulaire-connexion input");
     const logins = {
         "email": inputList[0].value,
@@ -23,12 +22,8 @@ async function connexion(){
     }
 } 
 
-
 let connectForm = document.querySelector(".formulaire-connexion");
-console.log(connectForm);
 connectForm.addEventListener("submit", async function(e){
-    console.log('holla');
     e.preventDefault();
-    // sessionStorage.removeItem("token")
     connexion();
 })
