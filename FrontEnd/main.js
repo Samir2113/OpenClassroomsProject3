@@ -47,6 +47,7 @@ filterList.forEach((categorie) => {
     const clickedBtn = e.target;
     if (clickedBtn.textContent === "Tous") {
       clickedBtn.classList.add("selected");
+      filteredList = works;
     } else {
       clickedBtn.classList.add("selected");
       filteredList = works.filter((work) => {

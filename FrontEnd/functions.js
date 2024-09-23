@@ -1,10 +1,4 @@
-import {
-  modal,
-  loginLink,
-  setModal,
-  worksZone,
-  worksEditZone,
-} from "./main.js";
+import { modal, setModal, logoutLink, worksZone, worksEditZone } from "./main.js";
 export {
   afficherTravaux,
   displaySwitch,
@@ -23,11 +17,6 @@ const validateFormBtn = document.querySelector("#validateBtn");
 let validForm = false;
 let trashList = document.querySelectorAll(".list-photo-edit .fa-trash-can");
 
-async function getWorks(){
-  const reponseWorks = await fetch("http://localhost:5678/api/works");
-  const works = await reponseWorks.json();
-  return works
-}  
 
 function afficherTravaux(workss, galleryZone, modalState) {
   // Les différents tests sont effectués pour différencier l'affichage
@@ -39,7 +28,6 @@ function afficherTravaux(workss, galleryZone, modalState) {
   let deleteIcon = document.createElement("i");
   deleteIcon.className = "fa-solid fa-trash-can";
   deleteIcon.setAttribute("style", "color: #FFFFFF;");
-
 
   for (let i = 0; i < workss.length; i++) {
     let work = document.createElement("figure");
@@ -68,7 +56,7 @@ function afficherTravaux(workss, galleryZone, modalState) {
 function displaySwitch(inputMode) {
   if (inputMode === true) {
     document.getElementById("editBanner").style.display = "flex";
-    loginLink.textContent = "logout";
+    logoutLink.textContent = "logout";
     document.getElementById("filter").style.display = "none";
     document.getElementById("portfolio").style.display = "flex";
     document.querySelector("#portfolio> h2").style.paddingBottom = `2em`;
