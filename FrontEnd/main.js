@@ -51,9 +51,15 @@ filterList.forEach((categorie) => {
     } else {
       clickedBtn.classList.add("selected");
       filteredList = works.filter((work) => {
+        console.log('work: '+ work.category.name);
+        console.log('btn: '+ clickedBtn.textContent);
+        console.log('filtered List: '+filteredList);
+        
         return work.category.name === clickedBtn.textContent;
       });
     }
+    console.log(filteredList);
+    
     afficherTravaux(filteredList, worksZone, modal);
   });
 });
