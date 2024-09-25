@@ -129,7 +129,8 @@ addImgBtn.addEventListener("click", () => {
     input.addEventListener("change", (e) => {
       const focusedInput = e.target;
       const addImgZone = document.querySelector(".add-img");
-      if (focusedInput.id === "imageUrl" && focusedInput.files[0]) {
+      // Si input image est modifié         // Si image est valide
+      if (focusedInput.id === "imageUrl" && validityImage(focusedInput)) {
         for (const item of addImgZone.children) {
           if (item.id === "img-preview") {
             const fileReader = new FileReader();
@@ -154,6 +155,7 @@ addImgBtn.addEventListener("click", () => {
 
       /// Vérification Validité Formulaire ///
       for (const input of inputs) {
+        // Si inputs vides
         if (input.value.trim() == "") {
           validForm = false;
           break;
@@ -171,6 +173,23 @@ addImgBtn.addEventListener("click", () => {
     goBackArrow(modalWrapper, modalElmtsArray);
   });
 });
+
+// Fonction Test poids/type de l'image
+function validityImage(imgInput){
+  const allowedFileTypes = ["image/png", "image/jpeg"];
+  const sizeLimit = 4194304;
+  try {
+    if(imgInput.files[0].size <= sizeLimit && allowedFileTypes.includes(imgInput.files[0].type)){
+      return true;
+    }else{
+      ResetImgPreview();
+      alert("Poids ou type de l'image invalide!")
+      return false;
+    }
+  } catch (error) {
+    console.log("Une erreur est survenue: "+error);
+  }
+} 
 
 /// Validation du formulaire ///
 validateFormBtn.addEventListener("click", async (e) => {
@@ -201,16 +220,8 @@ validateFormBtn.addEventListener("click", async (e) => {
 });
 
 function refreshInputs() {
-  const formImgZone = document.querySelector(".add-img").children;
-  const imgPreview = document.querySelector("#img-preview");
   /// RàZ de la "Zone preview" du Formulaire ///
-  Array.from(formImgZone).forEach((item) => {
-    if (item.id === imgPreview.id || item.type === "file") {
-      imgPreview.setAttribute("style", "display: none");
-    } else {
-      item.setAttribute("style", "display: null");
-    }
-  });
+  ResetImgPreview();
   /// RàZ des "Inputs" du Formulaire ///
   inputs.forEach((input) => {
     if (input.type === "file") {
@@ -221,6 +232,20 @@ function refreshInputs() {
     }
   });
   validateFormBtn.classList.remove("okColor");
+}
+
+function ResetImgPreview(){
+  const formImgZone = document.querySelector(".add-img").children;
+  const imgPreview = document.querySelector("#img-preview");
+  /// RàZ de la "Zone preview" du Formulaire ///
+  Array.from(formImgZone).forEach((item) => {
+    if (item.id === imgPreview.id || item.type === "file") {
+      imgPreview.setAttribute("style", "display: none");
+    } else {
+      item.setAttribute("style", "display: null");
+    }
+  });
+  imgUrl.value = null;
 }
 
 const goBackArrow = async function (modalZone, elementList) {

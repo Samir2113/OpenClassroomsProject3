@@ -11,7 +11,6 @@ async function connexion(){
     });
 
     if(testLogin.status === 200){
-        console.log("here");
         let myLogin = await testLogin.json();
         let myLoginToken = myLogin.token;
         sessionStorage.setItem("token",myLoginToken);
